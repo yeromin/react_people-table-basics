@@ -9,25 +9,6 @@ type Props = {
 export const PeopleTable: React.FC<Props> = ({ people }) => {
   const { slug } = useParams<{ slug?: string }>();
 
-  const getPersonByName = (name: string, sex: string): Person => {
-    const foundPerson = people.find(p => p.name === name);
-
-    if (foundPerson) {
-      return foundPerson;
-    }
-
-    // Create a placeholder person object for rendering
-    return {
-      name,
-      sex,
-      born: 0,
-      died: 0,
-      motherName: null,
-      fatherName: null,
-      slug: '',
-    };
-  };
-
   return (
     <table
       data-cy="peopleTable"
@@ -47,6 +28,12 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
       <tbody>
         {people.map(person => {
           const isSelected = slug === person.slug;
+          const mother = person.motherName
+            ? people.find(p => p.name === person.motherName)
+            : null;
+          const father = person.fatherName
+            ? people.find(p => p.name === person.fatherName)
+            : null;
 
           return (
             <tr
@@ -55,27 +42,29 @@ export const PeopleTable: React.FC<Props> = ({ people }) => {
               className={isSelected ? 'has-background-warning' : ''}
             >
               <td>
-                <PersonLink person={person} people={people} />
+                <PersonLink person={person} />
               </td>
               <td>{person.sex}</td>
               <td>{person.born}</td>
               <td>{person.died}</td>
               <td>
                 {person.motherName ? (
-                  <PersonLink
-                    person={getPersonByName(person.motherName, 'f')}
-                    people={people}
-                  />
+                  mother ? (
+                    <PersonLink person={mother} />
+                  ) : (
+                    person.motherName
+                  )
                 ) : (
                   '-'
                 )}
               </td>
               <td>
                 {person.fatherName ? (
-                  <PersonLink
-                    person={getPersonByName(person.fatherName, 'm')}
-                    people={people}
-                  />
+                  father ? (
+                    <PersonLink person={father} />
+                  ) : (
+                    person.fatherName
+                  )
                 ) : (
                   '-'
                 )}
